@@ -30,6 +30,14 @@ contract('YASC', function ([_, wallet1, wallet2, wallet3, wallet4, wallet5, user
         (await yasc.owner.call()).should.be.equal(multiWallet.address);
     });
 
+    it('should fail on bad action', async function () {
+        const action = '0x1' + abi.simpleEncode('mint(address,uint256)', user1, 100).toString('hex');
+        await multiWallet.performAction(yasc.address, action, { from: wallet1 });
+        await multiWallet.performAction(yasc.address, action, { from: wallet2 });
+        await multiWallet.performAction(yasc.address, action, { from: wallet3 });
+        await multiWallet.performAction(yasc.address, action, { from: wallet4 }).should.be.rejectedWith(EVMRevert);
+    });
+
     describe('mint', async function () {
         it('should fail on unauthorized call', async function () {
             await yasc.mint(_, 10, { from: user1 }).should.be.rejectedWith(EVMRevert);
