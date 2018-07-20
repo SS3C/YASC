@@ -12,6 +12,7 @@ contract Multiownable {
     address internal insideCallSender;
     uint256 internal insideCallCount;
     mapping(uint256 => bool) internal doneIds;
+    mapping(bytes32 => bytes) public operationData;
 
     // Reverse lookup tables for owners and allOperations
     mapping(address => uint) public ownersIndices; // Starts from 1
@@ -170,6 +171,7 @@ contract Multiownable {
         if (operationVotesCount == 1) {
             allOperationsIndicies[operation] = allOperations.length;
             allOperations.push(operation);
+            operationData[operation] = msg.data;
             emit OperationCreated(operation, howMany, owners.length, msg.sender);
         }
         emit OperationUpvoted(operation, operationVotesCount, howMany, owners.length, msg.sender);
@@ -199,6 +201,7 @@ contract Multiownable {
         delete votesMaskByOperation[operation];
         delete votesCountByOperation[operation];
         delete allOperationsIndicies[operation];
+        delete operationData[operation];
     }
 
     // PUBLIC METHODS
